@@ -16,7 +16,9 @@ extern "C" {
     fn listen_(event: &str, handler: &Closure<dyn FnMut(JsValue)>) -> Promise;
 }
 
+#[allow(dead_code)]
 pub struct EventListener(Promise, Closure<dyn FnMut(JsValue)>);
+
 impl Drop for EventListener {
     fn drop(&mut self) {
         let promise = self.0.clone();

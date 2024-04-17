@@ -101,8 +101,8 @@ where
 
                         let stream = match TlsAcceptor::from(server_config).accept(upgraded).await {
                             Ok(stream) => stream,
-                            Err(e) => {
-                                eprintln!("Failed to establish TLS Connection:{e}");
+                            Err(_e) => {
+                                // eprintln!("Failed to establish TLS Connection:{_e}");
                                 return;
                             }
                         };

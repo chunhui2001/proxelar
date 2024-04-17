@@ -78,6 +78,7 @@ impl Ssl {
             .expect("Failed to determine current UNIX time")
             .as_secs() as i64
             - NOT_BEFORE_OFFSET;
+
         x509_builder.set_not_before(Asn1Time::from_unix(not_before)?.as_ref())?;
         x509_builder.set_not_after(Asn1Time::from_unix(not_before + TTL_SECS)?.as_ref())?;
 
@@ -87,6 +88,7 @@ impl Ssl {
         let alternative_name = SubjectAlternativeName::new()
             .dns(authority.host())
             .build(&x509_builder.x509v3_context(Some(&self.ca_cert), None))?;
+
         x509_builder.append_extension(alternative_name)?;
 
         let mut serial_number = [0; 16];
@@ -97,7 +99,9 @@ impl Ssl {
         x509_builder.set_serial_number(&serial_number)?;
 
         x509_builder.sign(&self.pkey, self.hash)?;
+
         let x509 = x509_builder.build();
+
         Ok(rustls::Certificate(x509.to_der()?))
     }
 }
@@ -106,10 +110,11 @@ impl Ssl {
 impl CertificateAuthority for Ssl {
     async fn gen_server_config(&self, authority: &Authority) -> Arc<ServerConfig> {
         if let Some(server_cfg) = self.cache.get(authority) {
-            println!("Using cached server config");
+            // println!("Using cached server config");
             return server_cfg;
         }
-        println!("Generating server config");
+
+        // println!("Generating server config");
 
         let certs = vec![self
             .gen_cert(authority)
